@@ -19,7 +19,7 @@ public class PlayerTongueAction : MonoBehaviour
             }
             else if (collision.gameObject.layer == 6)
             {
-                PlayerMove.HitTongue(collision.gameObject.tag);
+                //PlayerMove.HitTongue(collision.gameObject.tag);
             }
         }
     }

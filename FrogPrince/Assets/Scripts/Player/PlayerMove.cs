@@ -274,18 +274,16 @@ public class PlayerMove : MonoBehaviour
         }
 
         //EnemyHit
-        RaycastHit2D[] enemyHit = new RaycastHit2D[8];
+        RaycastHit2D enemyHit;
 
-        float angleStep = 360.0f / enemyHit.Length;
-
-        for (int i = 0; i < enemyHit.Length; i++)
+        if(Tongue != null)
         {
-            float angle = i * angleStep;
-            float radian = angle * Mathf.Deg2Rad;
+            float angleStep = 360.0f / Tongue.transform.rotation.z;
+            float radian = angleStep * Mathf.Deg2Rad;
 
             Vector3 direction = new Vector3(Mathf.Cos(radian), Mathf.Sin(radian), 0);
 
-            enemyHit[i] = Physics2D.Raycast(Tongue.transform.position, direction, GroundRayLenth, GroundCheck);
+            enemyHit = Physics2D.Raycast(Tongue.transform.position, direction, GroundRayLenth, GroundCheck);
 
             Debug.DrawRay(Tongue.transform.position, direction, Color.green);
         }
@@ -509,9 +507,10 @@ public class PlayerMove : MonoBehaviour
             //MovePlayer
             if (_bFollowTongue && _sHitTongue != "none")
             {
+                Debug.Log(Tongue.transform.eulerAngles.z);
                 if (_sHitTongue == "platform")
                 {
-                    if (_bCeiling)
+                    if (_bCeiling || _bHitwall)
                     {
                         _bFollowTongue = false;
                     }
@@ -522,31 +521,39 @@ public class PlayerMove : MonoBehaviour
 
                 }
 
-                switch (Tongue.transform.rotation.z)
+                switch (Tongue.transform.eulerAngles.z)
                 {
                     case 0:
-                        transform.position += new Vector3(0, TonguePower * 0.25f, 0);
+                        transform.position += new Vector3(0, TonguePower * 0.25f, 0) * Time.deltaTime;
+                        Debug.Log(Tongue.transform.eulerAngles.z);
                         break;
                     case 45:
-                        transform.position += new Vector3(-TonguePower * 0.25f, TonguePower * 0.25f, 0);
+                        transform.position += new Vector3(-TonguePower * 0.25f, TonguePower * 0.25f, 0) * Time.deltaTime;
+                        Debug.Log(Tongue.transform.eulerAngles.z);
                         break;
                     case 90:
-                        transform.position += new Vector3(-TonguePower * 0.25f, 0, 0);
+                        transform.position += new Vector3(-TonguePower * 0.25f, 0, 0) * Time.deltaTime;
+                        Debug.Log(Tongue.transform.eulerAngles.z);
                         break;
                     case 135:
-                        transform.position += new Vector3(-TonguePower * 0.25f, -TonguePower * 0.25f, 0);
+                        transform.position += new Vector3(-TonguePower * 0.25f, -TonguePower * 0.25f, 0) * Time.deltaTime;
+                        Debug.Log(Tongue.transform.eulerAngles.z);
                         break;
                     case 180:
-                        transform.position += new Vector3(0, -TonguePower * 0.25f, 0);
+                        transform.position += new Vector3(0, -TonguePower * 0.25f, 0) * Time.deltaTime;
+                        Debug.Log(Tongue.transform.eulerAngles.z);
                         break;
                     case -135:
-                        transform.position += new Vector3(TonguePower * 0.25f, -TonguePower * 0.25f, 0);
+                        transform.position += new Vector3(TonguePower * 0.25f, -TonguePower * 0.25f, 0) * Time.deltaTime;
+                        Debug.Log(Tongue.transform.eulerAngles.z);
                         break;
                     case -90:
-                        transform.position += new Vector3(TonguePower * 0.25f, 0, 0);
+                        transform.position += new Vector3(TonguePower * 0.25f, 0, 0) * Time.deltaTime;
+                        Debug.Log(Tongue.transform.eulerAngles.z);
                         break;
                     case -45:
-                        transform.position += new Vector3(TonguePower * 0.25f, TonguePower * 0.25f, 0);
+                        transform.position += new Vector3(TonguePower * 0.25f, TonguePower * 0.25f, 0) * Time.deltaTime;
+                        Debug.Log(Tongue.transform.eulerAngles.z);
                         break;
                 }
             }
@@ -564,7 +571,6 @@ public class PlayerMove : MonoBehaviour
 
     public void HitTongue(string hit)
     {
-        Debug.Log(hit);
         _sHitTongue = hit;
         _bSizeUpTongue = false;
         _bFollowTongue = true;
