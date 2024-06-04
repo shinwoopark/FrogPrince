@@ -39,6 +39,7 @@ public class PlayerMove : MonoBehaviour
 
     public float TonguePower;
     public float TongueLenth;
+    private Vector3 _collisionPoint;
 
     private bool _bGround;
 
@@ -272,21 +273,6 @@ public class PlayerMove : MonoBehaviour
         {
             _bHitwall = false;
         }
-
-        //EnemyHit
-        RaycastHit2D enemyHit;
-
-        if(Tongue != null)
-        {
-            float angleStep = 360.0f / Tongue.transform.rotation.z;
-            float radian = angleStep * Mathf.Deg2Rad;
-
-            Vector3 direction = new Vector3(Mathf.Cos(radian), Mathf.Sin(radian), 0);
-
-            enemyHit = Physics2D.Raycast(Tongue.transform.position, direction, GroundRayLenth, GroundCheck);
-
-            Debug.DrawRay(Tongue.transform.position, direction, Color.green);
-        }
     }
 
     private void UpdateState()
@@ -496,23 +482,33 @@ public class PlayerMove : MonoBehaviour
 
             if (Tongue.transform.localScale.y >= TongueLenth)
             {
-                HitTongue("none");
+                HitTongue("none", _collisionPoint);
             }
         }
 
         if (_bSizeDownTongue)
         {
-            Tongue.transform.localScale -= new Vector3(0, TonguePower * Time.deltaTime, 0);
+            Tongue.transform.localScale = Vector3.Lerp(transform.localScale, new Vector3(0.25f, 0, 1), Time.deltaTime * 5);
 
-            //MovePlayer
-            if (_bFollowTongue && _sHitTongue != "none")
+            if (_bFollowTongue)
             {
-                Debug.Log(Tongue.transform.eulerAngles.z);
+                transform.position = Vector3.Lerp(transform.position, new Vector3(_collisionPoint.x, _collisionPoint.y, 0), Time.deltaTime * 5);
+            }
+
+            if (_sHitTongue == "none")
+            {
+                if (Tongue.transform.localScale.y <= 1)
+                {
+                    TurnBackTongue();
+                }                
+            }
+            else
+            {
                 if (_sHitTongue == "platform")
                 {
                     if (_bCeiling || _bHitwall)
                     {
-                        _bFollowTongue = false;
+                        TurnBackTongue();
                     }
                 }
 
@@ -520,61 +516,36 @@ public class PlayerMove : MonoBehaviour
                 {
 
                 }
-
-                switch (Tongue.transform.eulerAngles.z)
-                {
-                    case 0:
-                        transform.position += new Vector3(0, TonguePower * 0.25f, 0) * Time.deltaTime;
-                        Debug.Log(Tongue.transform.eulerAngles.z);
-                        break;
-                    case 45:
-                        transform.position += new Vector3(-TonguePower * 0.25f, TonguePower * 0.25f, 0) * Time.deltaTime;
-                        Debug.Log(Tongue.transform.eulerAngles.z);
-                        break;
-                    case 90:
-                        transform.position += new Vector3(-TonguePower * 0.25f, 0, 0) * Time.deltaTime;
-                        Debug.Log(Tongue.transform.eulerAngles.z);
-                        break;
-                    case 135:
-                        transform.position += new Vector3(-TonguePower * 0.25f, -TonguePower * 0.25f, 0) * Time.deltaTime;
-                        Debug.Log(Tongue.transform.eulerAngles.z);
-                        break;
-                    case 180:
-                        transform.position += new Vector3(0, -TonguePower * 0.25f, 0) * Time.deltaTime;
-                        Debug.Log(Tongue.transform.eulerAngles.z);
-                        break;
-                    case -135:
-                        transform.position += new Vector3(TonguePower * 0.25f, -TonguePower * 0.25f, 0) * Time.deltaTime;
-                        Debug.Log(Tongue.transform.eulerAngles.z);
-                        break;
-                    case -90:
-                        transform.position += new Vector3(TonguePower * 0.25f, 0, 0) * Time.deltaTime;
-                        Debug.Log(Tongue.transform.eulerAngles.z);
-                        break;
-                    case -45:
-                        transform.position += new Vector3(TonguePower * 0.25f, TonguePower * 0.25f, 0) * Time.deltaTime;
-                        Debug.Log(Tongue.transform.eulerAngles.z);
-                        break;
-                }
             }
-            //
 
-            if (Tongue.transform.localScale.y <= 0)
-            {
-                Tongue.transform.localScale = new Vector3(0.25f, 0, 1);
-                Tongue.SetActive(false);
-                _bSizeDownTongue = false;
-                _bMoveTongue = false;
-            }
+            
         }
     }
 
-    public void HitTongue(string hit)
+    public void HitTongue(string hit, Vector3 collisionPoint)
     {
+        if (hit != "none")
+        {
+            _bFollowTongue = true;
+        }
+        else
+        {
+            _bFollowTongue = false;
+        }
+
         _sHitTongue = hit;
+        _collisionPoint = collisionPoint;
+        Debug.Log(_collisionPoint);
         _bSizeUpTongue = false;
-        _bFollowTongue = true;
         _bSizeDownTongue = true;
+    }
+
+    private void TurnBackTongue()
+    {
+        Tongue.transform.localScale = new Vector3(0.25f, 0, 1);
+        Tongue.SetActive(false);
+        _bSizeDownTongue = false;
+        _bMoveTongue = false;
     }
 
     private void KnockBack()

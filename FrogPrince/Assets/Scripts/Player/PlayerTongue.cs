@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -15,7 +16,9 @@ public class PlayerTongueAction : MonoBehaviour
                 collision.gameObject.layer == 8 ||
                 collision.gameObject.layer == 9)
             {
-                PlayerMove.HitTongue("platform");
+                Vector3 collisionPoint = collision.ClosestPoint(transform.position);
+
+                PlayerMove.HitTongue("platform", collisionPoint);
             }
             else if (collision.gameObject.layer == 6)
             {
