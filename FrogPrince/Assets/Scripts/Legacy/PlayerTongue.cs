@@ -14,36 +14,20 @@ public class PlayerTongueAction : MonoBehaviour
     private void Start()
     {
         _collisionPoint = transform.position;
-
     }
 
-    private void Update()
-    {
-
-
-
-        if (Input.GetKeyDown(KeyCode.C))
-        {
-            test();
-        }
-    }
     public void test()
     {
-        //_mask = LayerMask.GetMask("Ceiling");
-
-
-
         RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.up, 100f, _mask);
         if (hit.collider != null)
         {
             _collisionPoint = hit.point;
             //PlayerMove.HitTongue("platform", _collisionPoint);
             Debug.Log(hit.collider.gameObject.layer);
-
         }
         else
         {
-            PlayerMove.HitTongue("none", _collisionPoint);
+            //PlayerMove.HitTongue("none", _collisionPoint);
         }
 
     }
@@ -64,13 +48,5 @@ public class PlayerTongueAction : MonoBehaviour
     //            //PlayerMove.HitTongue(collision.gameObject.tag);
     //        }
     //    }
-    }
-
-
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(_collisionPoint, 0.5f);
-        Gizmos.DrawLine(transform.position, _collisionPoint);
     }
 }

@@ -8,11 +8,11 @@ public class PlayerMove : MonoBehaviour
 {
     //이동, 점프, 차지점프, 등반
 
-    private Rigidbody2D _rigid;
-    private SpriteRenderer _spriteRenderer;
     private PlayerState _playerState;
 
-    public float MoveSpeed = 5;
+    private SpriteRenderer _spriteRenderer;
+
+    public float MoveSpeed;
     private int _moveDir = 0;
 
     public float JumpPower;
@@ -20,12 +20,15 @@ public class PlayerMove : MonoBehaviour
 
     public float ChargeJumpPower;
     private float _chargeJumpTime;
+    private float _chargeJumpMaxTime = 2;
+
+    public float ClimbPower;
+    private int _climbDir = 0;
 
     void Awake()
     {
         _playerState = GetComponent<PlayerState>();
         _spriteRenderer = GetComponent<SpriteRenderer>();
-        _rigid = GetComponent<Rigidbody2D>();
     }
 
     void Update()
@@ -37,6 +40,8 @@ public class PlayerMove : MonoBehaviour
     {
         UpdateFoward();
         UpdateJump();
+        UpdateChargeJump();
+        UpdateClimb();
     }
 
     private void InputMove()
@@ -44,18 +49,31 @@ public class PlayerMove : MonoBehaviour
         _moveDir = 0;
         if (Input.GetKey(KeyCode.RightArrow) && !Input.GetKey(KeyCode.LeftArrow))
         {
-            _moveDir = 1;
-            _spriteRenderer.flipY = false;
+            if(_playerState.bWall && !_spriteRenderer.flipY)
+            {
+                return;
+            }
+            else
+            {
+                _moveDir = 1;
+                _spriteRenderer.flipY = false;
+            }
         }
         else if (Input.GetKey(KeyCode.LeftArrow) && !Input.GetKey(KeyCode.RightArrow))
         {
-            _moveDir = -1;
-            _spriteRenderer.flipY = true;
-
+            if (_playerState.bWall && _spriteRenderer.flipY)
+            {
+                return;
+            }
+            else
+            {
+                _moveDir = -1;
+                _spriteRenderer.flipY = true;
+            }           
         }
 
         //Jump
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space) && _playerState.bGround)
         {
             if(_playerState.CurrentState == State.Idle)
             {
@@ -68,24 +86,53 @@ public class PlayerMove : MonoBehaviour
         }
 
         //ChargeJump
-        //Getkey랑 time.deltatime으로 점프 시간 체크
-        //일정 이상이면 누른만큼 float 변수에 더해서 jumpforce 더하기
-        //getkeyUDown에 state 변경, getkeyUp일 때 state를 idle로
-        if (Input.GetKey(KeyCode.DownArrow) && _playerState.CurrentState == State.Idle)
+        if (GameInstance.instance.TrasformLevel >= 1) 
         {
-            _playerState.CurrentState = State.Charging;
-            _chargeJumpTime += Time.deltaTime;
-        }
+            if (Input.GetKeyDown(KeyCode.DownArrow) && _playerState.CurrentState == State.Idle && _playerState.bGround)
+            {
+                _playerState.CurrentState = State.Charging;
+            }
 
-        if (Input.GetKeyUp(KeyCode.DownArrow) && _playerState.CurrentState == State.Idle)
+            if (Input.GetKey(KeyCode.DownArrow) && _playerState.CurrentState == State.Charging)
+            {
+                if (_chargeJumpMaxTime > _chargeJumpTime)
+                {
+                    _chargeJumpTime += Time.deltaTime;
+                }           
+            }
+
+            if (Input.GetKeyUp(KeyCode.DownArrow) && _playerState.CurrentState == State.Charging)
+            {
+                _playerState.CurrentState = State.ChargeJumping;
+            }
+        }
+        
+        //Climb
+        if(_playerState.CurrentState == State.Climb)
         {
-            _playerState.CurrentState = State.ChargeJumping;
+            if(Input.GetKey(KeyCode.DownArrow) && !Input.GetKey(KeyCode.UpArrow))
+            {
+                _climbDir = -1;
+            }
+            else if(!Input.GetKey(KeyCode.DownArrow) && Input.GetKey(KeyCode.UpArrow))
+            {
+                _climbDir = 1;
+            }
+            else
+            {
+                _climbDir = 0;
+            }
         }
     }
 
     private void UpdateFoward()
     {
-        transform.position += new Vector3(_moveDir * MoveSpeed * Time.deltaTime, 0, 0);
+        if(_playerState.CurrentState != State.Charging
+            && _playerState.CurrentState != State.Dash
+            && _playerState.CurrentState != State.MoveTongue)
+        {
+            transform.position += new Vector3(_moveDir * MoveSpeed * Time.deltaTime, 0, 0);
+        }       
     }
 
     private void UpdateJump()
@@ -130,14 +177,22 @@ public class PlayerMove : MonoBehaviour
         {
             if (_chargeJumpTime > 0)
             {
-                _chargeJumpTime -= Time.deltaTime;
+                _chargeJumpTime -= Time.deltaTime * 5;
 
                 transform.position += new Vector3(0, ChargeJumpPower * Time.deltaTime, 0);
             }
             else
             {
-                _jumpTime = 0.25f;
+                _playerState.CurrentState = State.Idle;
             }
+        }
+    }
+
+    private void UpdateClimb()
+    {
+        if (_playerState.CurrentState == State.Climb)
+        {
+            transform.position += new Vector3(0, ClimbPower * _climbDir * Time.deltaTime, 0);
         }
     }
 }
