@@ -75,11 +75,11 @@ public class PlayerMove : MonoBehaviour
         //Jump
         if (Input.GetKeyDown(KeyCode.Space) && _playerState.bGround)
         {
-            if(_playerState.CurrentState == State.Idle)
+            if(_playerState.CurrentState == PlayerStates.Idle)
             {
-                _playerState.CurrentState = State.Jumping;
+                _playerState.CurrentState = PlayerStates.Jumping;
             }
-            else if(_playerState.CurrentState == State.Climb)
+            else if(_playerState.CurrentState == PlayerStates.Climb)
             {
 
             }
@@ -88,12 +88,12 @@ public class PlayerMove : MonoBehaviour
         //ChargeJump
         if (GameInstance.instance.TrasformLevel >= 1) 
         {
-            if (Input.GetKeyDown(KeyCode.DownArrow) && _playerState.CurrentState == State.Idle && _playerState.bGround)
+            if (Input.GetKeyDown(KeyCode.DownArrow) && _playerState.CurrentState == PlayerStates.Idle && _playerState.bGround)
             {
-                _playerState.CurrentState = State.Charging;
+                _playerState.CurrentState = PlayerStates.Charging;
             }
 
-            if (Input.GetKey(KeyCode.DownArrow) && _playerState.CurrentState == State.Charging)
+            if (Input.GetKey(KeyCode.DownArrow) && _playerState.CurrentState == PlayerStates.Charging)
             {
                 if (_chargeJumpMaxTime > _chargeJumpTime)
                 {
@@ -101,14 +101,14 @@ public class PlayerMove : MonoBehaviour
                 }           
             }
 
-            if (Input.GetKeyUp(KeyCode.DownArrow) && _playerState.CurrentState == State.Charging)
+            if (Input.GetKeyUp(KeyCode.DownArrow) && _playerState.CurrentState == PlayerStates.Charging)
             {
-                _playerState.CurrentState = State.ChargeJumping;
+                _playerState.CurrentState = PlayerStates.ChargeJumping;
             }
         }
         
         //Climb
-        if(_playerState.CurrentState == State.Climb)
+        if(_playerState.CurrentState == PlayerStates.Climb)
         {
             if(Input.GetKey(KeyCode.DownArrow) && !Input.GetKey(KeyCode.UpArrow))
             {
@@ -127,9 +127,9 @@ public class PlayerMove : MonoBehaviour
 
     private void UpdateFoward()
     {
-        if(_playerState.CurrentState != State.Charging
-            && _playerState.CurrentState != State.Dash
-            && _playerState.CurrentState != State.MoveTongue)
+        if(_playerState.CurrentState != PlayerStates.Charging
+            && _playerState.CurrentState != PlayerStates.Dash
+            && _playerState.CurrentState != PlayerStates.MoveTongue)
         {
             transform.position += new Vector3(_moveDir * MoveSpeed * Time.deltaTime, 0, 0);
         }       
@@ -137,7 +137,7 @@ public class PlayerMove : MonoBehaviour
 
     private void UpdateJump()
     {
-        if (_playerState.CurrentState == State.Jumping)
+        if (_playerState.CurrentState == PlayerStates.Jumping)
         {
             if (Input.GetKey(KeyCode.Space) && _jumpTime > 0)
             {
@@ -147,7 +147,7 @@ public class PlayerMove : MonoBehaviour
             }
             else
             {
-                _playerState.CurrentState = State.Idle;
+                _playerState.CurrentState = PlayerStates.Idle;
             }
         }
         else
@@ -173,7 +173,7 @@ public class PlayerMove : MonoBehaviour
 
     private void UpdateChargeJump()
     {
-        if (_playerState.CurrentState == State.ChargeJumping)
+        if (_playerState.CurrentState == PlayerStates.ChargeJumping)
         {
             if (_chargeJumpTime > 0)
             {
@@ -183,14 +183,14 @@ public class PlayerMove : MonoBehaviour
             }
             else
             {
-                _playerState.CurrentState = State.Idle;
+                _playerState.CurrentState = PlayerStates.Idle;
             }
         }
     }
 
     private void UpdateClimb()
     {
-        if (_playerState.CurrentState == State.Climb)
+        if (_playerState.CurrentState == PlayerStates.Climb)
         {
             transform.position += new Vector3(0, ClimbPower * _climbDir * Time.deltaTime, 0);
         }

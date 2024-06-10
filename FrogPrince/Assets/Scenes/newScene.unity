@@ -197,7 +197,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 635496537}
+  - component: {fileID: 635496540}
+  - component: {fileID: 635496539}
   - component: {fileID: 635496536}
+  - component: {fileID: 635496538}
   - component: {fileID: 635496535}
   m_Layer: 6
   m_Name: Enemy
@@ -318,6 +321,78 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!50 &635496538
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 635496534}
+  m_BodyType: 0
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 0
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0
+--- !u!114 &635496539
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 635496534}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8502f04495836764f990bedce94dd0b7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MoveSpeed: 2
+  Dir: 1
+  RandomTimeDirSet: 1
+  MiniTime: 2
+  MaxTime: 5
+--- !u!114 &635496540
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 635496534}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99a527f4b94974e46b0a4db5618565f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  CurrentState: 1
+  GroundRayLenth: 1
+  CeilingRayLenth: 1
+  WallRayLenth: 1
+  GroundCheck:
+    serializedVersion: 2
+    m_Bits: 128
+  CeilingCheck:
+    serializedVersion: 2
+    m_Bits: 256
+  WallCheck:
+    serializedVersion: 2
+    m_Bits: 512
+  bGround: 0
+  bWall: 0
+  bCeiling: 0
 --- !u!1 &1433298236
 GameObject:
   m_ObjectHideFlags: 0

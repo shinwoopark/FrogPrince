@@ -46,8 +46,8 @@ public class PlayerControll : MonoBehaviour
         AttackCurrentTime += Time.deltaTime;
 
         if (Input.GetKeyDown(KeyCode.Z) && AttackCurrentTime >= AttackCoolTime
-            && _playerState.CurrentState != State.Dash
-            && _playerState.CurrentState != State.MoveTongue)
+            && _playerState.CurrentState != PlayerStates.Dash
+            && _playerState.CurrentState != PlayerStates.MoveTongue)
         {
             if (Input.GetKey(KeyCode.UpArrow) && !Input.GetKey(KeyCode.DownArrow))
             {
@@ -79,16 +79,16 @@ public class PlayerControll : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.X)
             && _playerState.bDash
             && _dashCoolTime <= 0
-            && _playerState.CurrentState != State.Slide
-            && _playerState.CurrentState != State.Climb
-            && _playerState.CurrentState != State.MoveTongue)
+            && _playerState.CurrentState != PlayerStates.Slide
+            && _playerState.CurrentState != PlayerStates.Climb
+            && _playerState.CurrentState != PlayerStates.MoveTongue)
         {
             if (_spriteRenderer.flipY)
                 _dashDirection = -1;
             else if (!_spriteRenderer.flipY)
                 _dashDirection = 1;
 
-            _playerState.CurrentState = State.Dash;
+            _playerState.CurrentState = PlayerStates.Dash;
             _dashCoolTime = 1;
         }
 
@@ -103,7 +103,7 @@ public class PlayerControll : MonoBehaviour
 
     IEnumerator Attack()
     {
-        _playerState.CurrentState = State.Attack;
+        _playerState.CurrentState = PlayerStates.Attack;
 
         Collider2D[] AttackBox = Physics2D.OverlapBoxAll(AttackPos.position, AttackSize, 0, HitLayers);
 
@@ -114,20 +114,20 @@ public class PlayerControll : MonoBehaviour
 
         yield return new WaitForSeconds(0.25f);
 
-        _playerState.CurrentState = State.Idle;
+        _playerState.CurrentState = PlayerStates.Idle;
     }
 
     private void UpdateDash()
     {
-        if (_playerState.CurrentState == State.Dash)
+        if (_playerState.CurrentState == PlayerStates.Dash)
         {
             _dashTime -= Time.deltaTime;
 
             transform.position += new Vector3(_dashDirection * DashPower * Time.deltaTime, 0, 0);
 
-            if (_playerState.CurrentState != State.Dash || _dashTime <= 0)
+            if (_playerState.CurrentState != PlayerStates.Dash || _dashTime <= 0)
             {
-                _playerState.CurrentState = State.Idle;
+                _playerState.CurrentState = PlayerStates.Idle;
                 _playerState.bDash = false;
             }
         }
@@ -145,7 +145,7 @@ public class PlayerControll : MonoBehaviour
 
     private void UpdateMoveTongue()
     {
-        if (_playerState.CurrentState == State.MoveTongue)
+        if (_playerState.CurrentState == PlayerStates.MoveTongue)
         {
 
         }
