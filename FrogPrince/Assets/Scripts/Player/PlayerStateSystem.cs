@@ -3,16 +3,22 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public enum EnemyStates
+public enum PlayerState
 {
     Idle,
-    Forward,
-    Attack
+    Jumping,
+    Charging,
+    ChargeJumping,
+    Dash,
+    Slide,
+    Climb,
+    Attack,
+    MoveTongue
 }
 
-public class EnemyState : MonoBehaviour
+public class PlayerStateSystem : MonoBehaviour
 {
-    public EnemyStates CurrentState = EnemyStates.Idle;
+    public PlayerState CurrentState = PlayerState.Idle;
 
     private SpriteRenderer _spriteRenderer;
 
@@ -27,6 +33,8 @@ public class EnemyState : MonoBehaviour
 
     private float _gravityScale;
 
+    public bool bDash;
+
     private void Awake()
     {
         _spriteRenderer = GetComponent<SpriteRenderer>();
@@ -36,6 +44,7 @@ public class EnemyState : MonoBehaviour
     {
         UpdateGravitySet();
         UpdateRayCast();
+        UpdateHitWall();
     }
 
     private void FixedUpdate()
@@ -45,13 +54,17 @@ public class EnemyState : MonoBehaviour
 
     private void UpdateGravitySet()
     {
-        if (!bGround)
+        if(!bGround)
         {
-            if (CurrentState == EnemyStates.Idle
-                || CurrentState == EnemyStates.Attack)
+            if(CurrentState == PlayerState.Idle
+                || CurrentState == PlayerState.Attack)
             {
                 _gravityScale = 7.5f;
-            }
+            }          
+        }
+        else if (CurrentState == PlayerState.Slide)
+        {
+            _gravityScale = 3.75f;
         }
         else
         {
@@ -68,22 +81,23 @@ public class EnemyState : MonoBehaviour
     {
         float dir = 1;
 
-        if (_spriteRenderer.flipY)
-            dir = -1;
-        else if (!_spriteRenderer.flipY)
+        if (_spriteRenderer.flipY)        
+            dir = -1;        
+        else if (!_spriteRenderer.flipY)       
             dir = 1;
-
+        
         RaycastHit2D downHit = Physics2D.Raycast(transform.position, Vector2.down, GroundRayLenth, GroundCheck);
         RaycastHit2D upHit = Physics2D.Raycast(transform.position, Vector2.up, CeilingRayLenth, CeilingCheck);
         RaycastHit2D sideHit = Physics2D.Raycast(transform.position, transform.right * dir, WallRayLenth, WallCheck);
 
         Debug.DrawRay(transform.position, Vector2.down * GroundRayLenth, Color.blue);
         Debug.DrawRay(transform.position, Vector2.up * CeilingRayLenth, Color.blue);
-        Debug.DrawRay(transform.position, transform.right * dir * WallRayLenth, Color.blue);
+        Debug.DrawRay(transform.position, transform.right * dir * WallRayLenth, Color.blue);       
 
         if (downHit.collider != null)
         {
             bGround = true;
+            bDash = true;
         }
         else
         {
@@ -106,6 +120,38 @@ public class EnemyState : MonoBehaviour
         else
         {
             bWall = false;
+        }
+    }
+
+    private void UpdateHitWall()
+    {
+        if (GameInstance.instance.TrasformLevel == 1)
+        {
+            if (bWall)
+            {
+                CurrentState = PlayerState.Slide;
+            }
+
+            if (CurrentState == PlayerState.Slide)
+            {
+                if (!bWall)
+                    CurrentState = PlayerState.Idle;
+            }
+        }
+        else if (GameInstance.instance.TrasformLevel >= 2)
+        {
+            if (bWall)
+            {
+                CurrentState = PlayerState.Climb;
+            }
+
+            if (CurrentState == PlayerState.Climb)
+            {
+                bDash = true;
+
+                if (!bWall)
+                    CurrentState = PlayerState.Idle;
+            }
         }
     }
 }

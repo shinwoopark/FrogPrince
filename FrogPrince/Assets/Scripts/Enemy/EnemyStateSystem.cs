@@ -3,22 +3,17 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public enum PlayerStates
+public enum EnemyState
 {
     Idle,
-    Jumping,
-    Charging,
-    ChargeJumping,
-    Dash,
-    Slide,
-    Climb,
+    Forward,
     Attack,
-    MoveTongue
+    Death
 }
 
-public class PlayerState : MonoBehaviour
+public class EnemyStateSystem : MonoBehaviour
 {
-    public PlayerStates CurrentState = PlayerStates.Idle;
+    public EnemyState CurrentState = EnemyState.Idle;
 
     private SpriteRenderer _spriteRenderer;
 
@@ -33,8 +28,6 @@ public class PlayerState : MonoBehaviour
 
     private float _gravityScale;
 
-    public bool bDash;
-
     private void Awake()
     {
         _spriteRenderer = GetComponent<SpriteRenderer>();
@@ -42,29 +35,30 @@ public class PlayerState : MonoBehaviour
 
     private void Update()
     {
-        UpdateGravitySet();
-        UpdateRayCast();
-        UpdateHitWall();
+        if (CurrentState != EnemyState.Death)
+        {
+            UpdateGravitySet();
+            UpdateRayCast();
+        }  
     }
 
     private void FixedUpdate()
     {
-        UpdateGravity();
+        if (CurrentState != EnemyState.Death)
+        {
+            UpdateGravity();
+        }           
     }
 
     private void UpdateGravitySet()
     {
-        if(!bGround)
+        if (!bGround)
         {
-            if(CurrentState == PlayerStates.Idle
-                || CurrentState == PlayerStates.Attack)
+            if (CurrentState == EnemyState.Idle
+                || CurrentState == EnemyState.Attack)
             {
                 _gravityScale = 7.5f;
-            }          
-        }
-        else if (CurrentState == PlayerStates.Slide)
-        {
-            _gravityScale = 3.75f;
+            }
         }
         else
         {
@@ -81,23 +75,22 @@ public class PlayerState : MonoBehaviour
     {
         float dir = 1;
 
-        if (_spriteRenderer.flipY)        
-            dir = -1;        
-        else if (!_spriteRenderer.flipY)       
+        if (_spriteRenderer.flipY)
+            dir = -1;
+        else if (!_spriteRenderer.flipY)
             dir = 1;
-        
+
         RaycastHit2D downHit = Physics2D.Raycast(transform.position, Vector2.down, GroundRayLenth, GroundCheck);
         RaycastHit2D upHit = Physics2D.Raycast(transform.position, Vector2.up, CeilingRayLenth, CeilingCheck);
         RaycastHit2D sideHit = Physics2D.Raycast(transform.position, transform.right * dir, WallRayLenth, WallCheck);
 
         Debug.DrawRay(transform.position, Vector2.down * GroundRayLenth, Color.blue);
         Debug.DrawRay(transform.position, Vector2.up * CeilingRayLenth, Color.blue);
-        Debug.DrawRay(transform.position, transform.right * dir * WallRayLenth, Color.blue);       
+        Debug.DrawRay(transform.position, transform.right * dir * WallRayLenth, Color.blue);
 
         if (downHit.collider != null)
         {
             bGround = true;
-            bDash = true;
         }
         else
         {
@@ -120,38 +113,6 @@ public class PlayerState : MonoBehaviour
         else
         {
             bWall = false;
-        }
-    }
-
-    private void UpdateHitWall()
-    {
-        if (GameInstance.instance.TrasformLevel == 1)
-        {
-            if (bWall)
-            {
-                CurrentState = PlayerStates.Slide;
-            }
-
-            if (CurrentState == PlayerStates.Slide)
-            {
-                if (!bWall)
-                    CurrentState = PlayerStates.Idle;
-            }
-        }
-        else if (GameInstance.instance.TrasformLevel >= 2)
-        {
-            if (bWall)
-            {
-                CurrentState = PlayerStates.Climb;
-            }
-
-            if (CurrentState == PlayerStates.Climb)
-            {
-                bDash = true;
-
-                if (!bWall)
-                    CurrentState = PlayerStates.Idle;
-            }
         }
     }
 }

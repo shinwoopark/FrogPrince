@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class EnemyMove : MonoBehaviour
 {
-    private EnemyState _enemyState; 
+    private EnemyStateSystem _enemyState; 
 
     private SpriteRenderer _spriteRenderer;
 
@@ -17,7 +17,7 @@ public class EnemyMove : MonoBehaviour
 
     private void Awake()
     {
-        _enemyState = GetComponent<EnemyState>();
+        _enemyState = GetComponent<EnemyStateSystem>();
         _spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
@@ -28,17 +28,23 @@ public class EnemyMove : MonoBehaviour
 
     private void Update()
     {
-        UpdateDir();
+        if (_enemyState.CurrentState != EnemyState.Death)
+        {
+            UpdateDir();
+        }          
     }
 
     private void FixedUpdate()
     {
-        UpdateMove();
+        if (_enemyState.CurrentState != EnemyState.Death)
+        {
+            UpdateMove();
+        }        
     }  
 
     private void UpdateMove()
     {
-        if(_enemyState.CurrentState == EnemyStates.Forward)
+        if(_enemyState.CurrentState == EnemyState.Forward)
         {
             transform.position += new Vector3(MoveSpeed * Dir * Time.deltaTime, 0, 0);
         }

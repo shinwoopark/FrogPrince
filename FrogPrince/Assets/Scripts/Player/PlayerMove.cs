@@ -8,7 +8,7 @@ public class PlayerMove : MonoBehaviour
 {
     //이동, 점프, 차지점프, 등반
 
-    private PlayerState _playerState;
+    private PlayerStateSystem _playerState;
 
     private SpriteRenderer _spriteRenderer;
 
@@ -27,7 +27,7 @@ public class PlayerMove : MonoBehaviour
 
     void Awake()
     {
-        _playerState = GetComponent<PlayerState>();
+        _playerState = GetComponent<PlayerStateSystem>();
         _spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
@@ -75,11 +75,11 @@ public class PlayerMove : MonoBehaviour
         //Jump
         if (Input.GetKeyDown(KeyCode.Space) && _playerState.bGround)
         {
-            if(_playerState.CurrentState == PlayerStates.Idle)
+            if(_playerState.CurrentState == PlayerState.Idle)
             {
-                _playerState.CurrentState = PlayerStates.Jumping;
+                _playerState.CurrentState = PlayerState.Jumping;
             }
-            else if(_playerState.CurrentState == PlayerStates.Climb)
+            else if(_playerState.CurrentState == PlayerState.Climb)
             {
 
             }
@@ -88,12 +88,12 @@ public class PlayerMove : MonoBehaviour
         //ChargeJump
         if (GameInstance.instance.TrasformLevel >= 1) 
         {
-            if (Input.GetKeyDown(KeyCode.DownArrow) && _playerState.CurrentState == PlayerStates.Idle && _playerState.bGround)
+            if (Input.GetKeyDown(KeyCode.DownArrow) && _playerState.CurrentState == PlayerState.Idle && _playerState.bGround)
             {
-                _playerState.CurrentState = PlayerStates.Charging;
+                _playerState.CurrentState = PlayerState.Charging;
             }
 
-            if (Input.GetKey(KeyCode.DownArrow) && _playerState.CurrentState == PlayerStates.Charging)
+            if (Input.GetKey(KeyCode.DownArrow) && _playerState.CurrentState == PlayerState.Charging)
             {
                 if (_chargeJumpMaxTime > _chargeJumpTime)
                 {
@@ -101,14 +101,14 @@ public class PlayerMove : MonoBehaviour
                 }           
             }
 
-            if (Input.GetKeyUp(KeyCode.DownArrow) && _playerState.CurrentState == PlayerStates.Charging)
+            if (Input.GetKeyUp(KeyCode.DownArrow) && _playerState.CurrentState == PlayerState.Charging)
             {
-                _playerState.CurrentState = PlayerStates.ChargeJumping;
+                _playerState.CurrentState = PlayerState.ChargeJumping;
             }
         }
         
         //Climb
-        if(_playerState.CurrentState == PlayerStates.Climb)
+        if(_playerState.CurrentState == PlayerState.Climb)
         {
             if(Input.GetKey(KeyCode.DownArrow) && !Input.GetKey(KeyCode.UpArrow))
             {
@@ -127,9 +127,9 @@ public class PlayerMove : MonoBehaviour
 
     private void UpdateFoward()
     {
-        if(_playerState.CurrentState != PlayerStates.Charging
-            && _playerState.CurrentState != PlayerStates.Dash
-            && _playerState.CurrentState != PlayerStates.MoveTongue)
+        if(_playerState.CurrentState != PlayerState.Charging
+            && _playerState.CurrentState != PlayerState.Dash
+            && _playerState.CurrentState != PlayerState.MoveTongue)
         {
             transform.position += new Vector3(_moveDir * MoveSpeed * Time.deltaTime, 0, 0);
         }       
@@ -137,7 +137,7 @@ public class PlayerMove : MonoBehaviour
 
     private void UpdateJump()
     {
-        if (_playerState.CurrentState == PlayerStates.Jumping)
+        if (_playerState.CurrentState == PlayerState.Jumping)
         {
             if (Input.GetKey(KeyCode.Space) && _jumpTime > 0)
             {
@@ -147,7 +147,7 @@ public class PlayerMove : MonoBehaviour
             }
             else
             {
-                _playerState.CurrentState = PlayerStates.Idle;
+                _playerState.CurrentState = PlayerState.Idle;
             }
         }
         else
@@ -173,7 +173,7 @@ public class PlayerMove : MonoBehaviour
 
     private void UpdateChargeJump()
     {
-        if (_playerState.CurrentState == PlayerStates.ChargeJumping)
+        if (_playerState.CurrentState == PlayerState.ChargeJumping)
         {
             if (_chargeJumpTime > 0)
             {
@@ -183,14 +183,14 @@ public class PlayerMove : MonoBehaviour
             }
             else
             {
-                _playerState.CurrentState = PlayerStates.Idle;
+                _playerState.CurrentState = PlayerState.Idle;
             }
         }
     }
 
     private void UpdateClimb()
     {
-        if (_playerState.CurrentState == PlayerStates.Climb)
+        if (_playerState.CurrentState == PlayerState.Climb)
         {
             transform.position += new Vector3(0, ClimbPower * _climbDir * Time.deltaTime, 0);
         }
