@@ -20,10 +20,13 @@ public class EnemyStateSystem : MonoBehaviour
     public float GroundRayLenth, CeilingRayLenth, WallRayLenth;
     public LayerMask GroundCheck, CeilingCheck, WallCheck;
 
+    public float NuckBackPower;
+
+    [HideInInspector]
     public bool bGround;
-
+    [HideInInspector]
     public bool bWall;
-
+    [HideInInspector]
     public bool bCeiling;
 
     private float _gravityScale;

@@ -5,9 +5,15 @@ using UnityEngine;
 
 public class Boss1Pattern1 : MonoBehaviour
 {
-    private Boss1StateSystem _boss1StateSystem;
+    public Bullet WindBullet;
+
+    public Transform Player_tr;
+
+    public Boss1StateSystem Boss1StateSystem;
 
     public Transform WayPoint, FinishPoint;
+
+    public GameObject WindBullet_gb;
 
     private int _wayPointNumber;
 
@@ -25,7 +31,7 @@ public class Boss1Pattern1 : MonoBehaviour
 
     private void Update()
     {
-        if (_boss1StateSystem.CurrentState == Boss1State.Pattern1)
+        if (Boss1StateSystem.CurrentState == Boss1State.Pattern1)
         {
             FindWayPoint();
         }         
@@ -33,7 +39,7 @@ public class Boss1Pattern1 : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (_boss1StateSystem.CurrentState == Boss1State.Pattern1)
+        if (Boss1StateSystem.CurrentState == Boss1State.Pattern1)
         {
             UpdateFollowWayPoint();
         }         
@@ -62,11 +68,11 @@ public class Boss1Pattern1 : MonoBehaviour
     {
         if (_bFindWayPoint && _hitWayPoint < 5) 
         {
-            _wayPointDir += WayPoint.GetChild(_wayPointNumber).position - transform.position;          
+            _wayPointDir = WayPoint.GetChild(_wayPointNumber).position - transform.position;          
         }
         else
         {
-            _wayPointDir += FinishPoint.position - transform.position;
+            _wayPointDir = FinishPoint.position - transform.position;
         }
 
         _wayPointDir.Normalize();
@@ -80,17 +86,26 @@ public class Boss1Pattern1 : MonoBehaviour
         }       
     }
 
+    IEnumerator WindAttack()
+    {
+        Debug.Log("!");
+        yield return new WaitForSeconds(1);
+        Vector3 dir = transform.position - Player_tr.position;
+        Instantiate(WindBullet_gb, transform.position, Quaternion.identity);
+
+    }
+
     private void SpawnWayPoint()
     {
         for(int i = 0; i < 5; i++)
         {
             int pattern = Random.Range(0, 3);
 
-            float x = -7;
+            float x = -10;
 
             for (int j = 0; j < i; j++)
             {
-                x -= -3.5f;
+                x -= -5;
             }
 
             switch(pattern)
@@ -109,17 +124,17 @@ public class Boss1Pattern1 : MonoBehaviour
 
         if (_dir == 1)
         {
-            FinishPoint.position = new Vector3(8, 3, 0);
+            FinishPoint.position = new Vector3(11, 3, 0);
         }
         else if (_dir == -1)
         {
-            FinishPoint.position = new Vector3(-8, 3, 0);
+            FinishPoint.position = new Vector3(-11, 3, 0);
         }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (_boss1StateSystem.CurrentState == Boss1State.Pattern1)
+        if (Boss1StateSystem.CurrentState == Boss1State.Pattern1)
         {
             if (collision.gameObject.tag == "WayPoint")
             {
@@ -137,6 +152,7 @@ public class Boss1Pattern1 : MonoBehaviour
             if (collision.gameObject.tag == "FinishPoint")
             {
                 _bFinishMove = true;
+                StartCoroutine(WindAttack());
             }
         }        
     }

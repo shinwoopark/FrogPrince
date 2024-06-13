@@ -157,6 +157,6 @@ public class PlayerControll : MonoBehaviour
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.blue;
-        Gizmos.DrawCube(AttackPos.position, AttackSize);
+        //Gizmos.DrawCube(AttackPos.position, AttackSize);
     }
 }
