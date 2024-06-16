@@ -5,10 +5,13 @@ using UnityEngine;
 public class PlayerHpSystem : MonoBehaviour
 {
     private EnemyStateSystem _enemyStateSystem;
+    private BulletSystem _bulletSystem;
 
     private SpriteRenderer _spriteRenderer;
 
     public float InvincibilityTime;
+
+    private float _damage;
 
     private bool _bNuckBack;
     private float _nuckBackTime;
@@ -34,10 +37,7 @@ public class PlayerHpSystem : MonoBehaviour
     {
         switch (collision.gameObject.layer)
         {
-            case 6:
-                
-                HpDown();
-
+            case 6:               
                 ContactPoint2D contact = collision.contacts[0];
                 Vector3 hitPos = contact.point;
 
@@ -51,6 +51,10 @@ public class PlayerHpSystem : MonoBehaviour
                 }
                
                 _enemyStateSystem = collision.collider.GetComponent<EnemyStateSystem>();
+
+                _damage = _enemyStateSystem.Damage;
+                HpDown();
+
                 _nuckBackPower = _enemyStateSystem.NuckBackPower;
                 _nuckBackTime = 0.1f;
                 _bNuckBack = true;
@@ -58,26 +62,36 @@ public class PlayerHpSystem : MonoBehaviour
         }
     }
 
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if(collision.gameObject.layer == 11)
+        {
+            _bulletSystem = collision.gameObject.GetComponent<BulletSystem>();
+
+            _damage = _bulletSystem.Damage;
+            HpDown();
+        }
+    }
+
     private void HpDown()
     {
-        GameInstance.instance.CurrentHp -= 1;
+        GameInstance.instance.CurrentHp -= _damage;
         InvincibilityTime = 1;
-        StartCoroutine(Blink());
+
+        if (GameInstance.instance.CurrentHp > 0)
+            StartCoroutine(Blink());
     }
 
     IEnumerator Blink()
     {
-        if(GameInstance.instance.CurrentHp > 0)
-        {
-            _spriteRenderer.color -= new Color(0, 0, 0, 0.75f);
-            yield return new WaitForSeconds(0.25f);
-            _spriteRenderer.color += new Color(0, 0, 0, 0.4f);
-            yield return new WaitForSeconds(0.25f);
-            _spriteRenderer.color -= new Color(0, 0, 0, 0.4f);
-            yield return new WaitForSeconds(0.25f);
-            _spriteRenderer.color += new Color(0, 0, 0, 0.75f);
-            yield return new WaitForSeconds(0.25f);
-        }     
+        _spriteRenderer.color -= new Color(0, 0, 0, 0.75f);
+        yield return new WaitForSeconds(0.25f);
+        _spriteRenderer.color += new Color(0, 0, 0, 0.4f);
+        yield return new WaitForSeconds(0.25f);
+        _spriteRenderer.color -= new Color(0, 0, 0, 0.4f);
+        yield return new WaitForSeconds(0.25f);
+        _spriteRenderer.color += new Color(0, 0, 0, 0.75f);
+        yield return new WaitForSeconds(0.25f);
     }
 
     private void UpdateNuckBack()

@@ -20,6 +20,7 @@ public class EnemyStateSystem : MonoBehaviour
     public float GroundRayLenth, CeilingRayLenth, WallRayLenth;
     public LayerMask GroundCheck, CeilingCheck, WallCheck;
 
+    public float Damage;
     public float NuckBackPower;
 
     [HideInInspector]

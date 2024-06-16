@@ -4,36 +4,40 @@ using UnityEngine;
 
 public enum Boss1State
 {
-    PatternCool,
+    Idle,
     Pattern1,
     Pattern2
 }
 
 public class Boss1StateSystem : MonoBehaviour
 {
-    public Boss1State CurrentState = Boss1State.PatternCool;
+    public Boss1State CurrentState = Boss1State.Idle;
 
     private Boss1Pattern1 _boss1Pattern1;
+    private Boss1Pattern2 _boss1Pattern2;
+
+    private int _patternCount = 0;
 
     private void Awake()
     {
         _boss1Pattern1 = GetComponent<Boss1Pattern1>();
-        CallPattern1();
+        _boss1Pattern2 = GetComponent<Boss1Pattern2>();
+        CallPattern();
     }
 
-    private void CallPattern1()
+    public void CallPattern()
     {
-        int dir = 0;
-
-        if(transform.position.x < 0)
+        if (_patternCount < 3)
         {
-            dir = 1;
+            CurrentState = Boss1State.Pattern2;
+            _boss1Pattern2.StartPattern();
+            _patternCount++;
         }
         else
         {
-            dir = -1;
+            _boss1Pattern1.StartPattern();
+            CurrentState = Boss1State.Pattern1;
+            _patternCount = 0;
         }
-
-        _boss1Pattern1.StartPattern(dir);
     }
 }

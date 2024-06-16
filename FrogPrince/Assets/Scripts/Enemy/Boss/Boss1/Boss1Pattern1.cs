@@ -5,13 +5,13 @@ using UnityEngine;
 
 public class Boss1Pattern1 : MonoBehaviour
 {
-    public Bullet WindBullet;
+    private Boss1StateSystem _boss1StateSystem;
 
-    public Transform Player_tr;
+    public BulletSystem WindBullet;
 
-    public Boss1StateSystem Boss1StateSystem;
+    public Transform Player_tr;  
 
-    public Transform WayPoint, FinishPoint;
+    public Transform StartPoint, WayPoint, FinishPoint;
 
     public GameObject WindBullet_gb;
 
@@ -27,46 +27,60 @@ public class Boss1Pattern1 : MonoBehaviour
 
     private int _dir;
 
+    private bool _bReady;
+
     private bool _bFinishMove;
+
+    private void Awake()
+    {
+        _boss1StateSystem = GetComponent<Boss1StateSystem>();
+    }
 
     private void Update()
     {
-        if (Boss1StateSystem.CurrentState == Boss1State.Pattern1)
+        if (_boss1StateSystem.CurrentState == Boss1State.Pattern1)
         {
             FindWayPoint();
-        }         
+        }      
     }
 
     private void FixedUpdate()
     {
-        if (Boss1StateSystem.CurrentState == Boss1State.Pattern1)
+        if (_boss1StateSystem.CurrentState == Boss1State.Pattern1)
         {
-            UpdateFollowWayPoint();
-        }         
+            UpdateMove();
+        }
     }
 
-    public void StartPattern(int dir)
+    public void StartPattern()
     {
-        _dir = dir;
+        int dir = Random.Range(0, 2);
 
-        if (dir == 1)
+        if (dir == 0)
         {
             _wayPointNumber = 0;
+            _dir = 1;
         }
-        else if(dir == -1)
+        else if(dir == 1)
         {
             _wayPointNumber = 4;
+            _dir = -1;
         }
 
         SpawnWayPoint();
         _hitWayPoint = 0;
+        _bReady = false;
         _bFindWayPoint = true;
         _bFinishMove = false;
     }
 
     private void FindWayPoint()
     {
-        if (_bFindWayPoint && _hitWayPoint < 5) 
+        if (!_bReady)
+        {
+            _wayPointDir = StartPoint.position - transform.position;
+        }
+        else if (_bFindWayPoint && _hitWayPoint < 5) 
         {
             _wayPointDir = WayPoint.GetChild(_wayPointNumber).position - transform.position;          
         }
@@ -78,7 +92,7 @@ public class Boss1Pattern1 : MonoBehaviour
         _wayPointDir.Normalize();
     }
 
-    private void UpdateFollowWayPoint()
+    private void UpdateMove()
     {
         if (!_bFinishMove)
         {
@@ -88,11 +102,20 @@ public class Boss1Pattern1 : MonoBehaviour
 
     IEnumerator WindAttack()
     {
-        Debug.Log("!");
         yield return new WaitForSeconds(1);
-        Vector3 dir = transform.position - Player_tr.position;
-        Instantiate(WindBullet_gb, transform.position, Quaternion.identity);
+        Vector3 dir = Player_tr.position - transform.position;
+        dir.Normalize();
 
+        FireWind(dir);
+        FireWind(dir -= new Vector3(0.5f, 0, 0));
+        FireWind(dir -= new Vector3(-1.5f, 0, 0));
+    }
+
+    private void FireWind(Vector3 dir)
+    {
+        WindBullet = WindBullet_gb.GetComponent<BulletSystem>();
+        WindBullet.Dir = dir;
+        Instantiate(WindBullet_gb, transform.position, Quaternion.identity);
     }
 
     private void SpawnWayPoint()
@@ -122,30 +145,48 @@ public class Boss1Pattern1 : MonoBehaviour
             }
         }
 
-        if (_dir == 1)
+        if (_dir == -1)
         {
-            FinishPoint.position = new Vector3(11, 3, 0);
-        }
-        else if (_dir == -1)
-        {
+            StartPoint.position = new Vector3(20, 0, 0);
             FinishPoint.position = new Vector3(-11, 3, 0);
         }
+        else if (_dir == 1)
+        {
+            StartPoint.position = new Vector3(-20, 0, 0);
+            FinishPoint.position = new Vector3(11, 3, 0);
+        }
+    }
+
+    private void EndPattern()
+    {
+        _boss1StateSystem.CallPattern();
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (Boss1StateSystem.CurrentState == Boss1State.Pattern1)
+        if (_boss1StateSystem.CurrentState == Boss1State.Pattern1)
         {
+            if (collision.gameObject.tag == "StartPoint")
+            {
+                _bReady = true;
+            }
+
             if (collision.gameObject.tag == "WayPoint")
             {
                 if (collision.gameObject == WayPoint.GetChild(_wayPointNumber).gameObject)
                 {
                     _hitWayPoint++;
 
-                    if (_dir == 1)
+                    if (_dir == 1
+                        && _hitWayPoint < 5)
+                    {
                         _wayPointNumber++;
-                    else if (_dir == -1)
+                    }
+                    else if (_dir == -1
+                        && _hitWayPoint < 5)
+                    {
                         _wayPointNumber--;
+                    }
                 }
             }
 
@@ -153,7 +194,8 @@ public class Boss1Pattern1 : MonoBehaviour
             {
                 _bFinishMove = true;
                 StartCoroutine(WindAttack());
+                Invoke("EndPattern", 2);
             }
-        }        
+        }          
     }
 }

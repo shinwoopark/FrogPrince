@@ -60,12 +60,12 @@ public class PlayerStateSystem : MonoBehaviour
                 || CurrentState == PlayerState.Attack)
             {
                 _gravityScale = 7.5f;
-            }          
-        }
-        else if (CurrentState == PlayerState.Slide)
-        {
-            _gravityScale = 3.75f;
-        }
+            }
+            else if (CurrentState == PlayerState.Slide)
+            {
+                _gravityScale = 3.75f;
+            }
+        }        
         else
         {
             _gravityScale = 0;

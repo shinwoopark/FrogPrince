@@ -86,7 +86,7 @@ public class PlayerMove : MonoBehaviour
         }
 
         //ChargeJump
-        if (GameInstance.instance.TrasformLevel >= 1) 
+        if (GameInstance.instance.TrasformLevel >= 1)
         {
             if (Input.GetKeyDown(KeyCode.DownArrow) && _playerState.CurrentState == PlayerState.Idle && _playerState.bGround)
             {

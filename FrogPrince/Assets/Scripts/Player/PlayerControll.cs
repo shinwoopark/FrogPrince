@@ -110,9 +110,12 @@ public class PlayerControll : MonoBehaviour
 
         foreach(Collider2D hit in AttackBox)
         {
-            _enemyHpSystem = hit.GetComponent<EnemyHpSystem>();
+            if(hit.gameObject.layer == 6)
+            {
+                _enemyHpSystem = hit.GetComponent<EnemyHpSystem>();
 
-            _enemyHpSystem.HpDown();
+                _enemyHpSystem.HpDown();
+            }
         }
 
         yield return new WaitForSeconds(0.25f);
