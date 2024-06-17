@@ -6,6 +6,7 @@ public class PlayerHpSystem : MonoBehaviour
 {
     private EnemyStateSystem _enemyStateSystem;
     private BulletSystem _bulletSystem;
+    private BossStateSystem _bossStateSystem;
 
     private SpriteRenderer _spriteRenderer;
 
@@ -35,30 +36,38 @@ public class PlayerHpSystem : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        switch (collision.gameObject.layer)
+        if(collision.gameObject.layer == 6
+            || collision.gameObject.layer == 20)
         {
-            case 6:               
-                ContactPoint2D contact = collision.contacts[0];
-                Vector3 hitPos = contact.point;
+            ContactPoint2D contact = collision.contacts[0];
+            Vector3 hitPos = contact.point;
 
-                if (transform.position.x - hitPos.x > 0)
-                {
-                    _nuckBackDir = 1;
-                }
-                if (transform.position.x - hitPos.x < 0)
-                {
-                    _nuckBackDir = -1;
-                }
-               
+            if (transform.position.x - hitPos.x > 0)
+            {
+                _nuckBackDir = 1;
+            }
+            if (transform.position.x - hitPos.x < 0)
+            {
+                _nuckBackDir = -1;
+            }
+
+            if(collision.gameObject.layer == 6)
+            {
                 _enemyStateSystem = collision.collider.GetComponent<EnemyStateSystem>();
-
                 _damage = _enemyStateSystem.Damage;
-                HpDown();
-
                 _nuckBackPower = _enemyStateSystem.NuckBackPower;
-                _nuckBackTime = 0.1f;
-                _bNuckBack = true;
-                break;
+            }
+            else
+            {
+                _bossStateSystem = collision.collider.GetComponent<BossStateSystem>();
+                _damage = _bossStateSystem.Damage;
+                _nuckBackPower = _bossStateSystem.NuckBackPower;
+            }
+            
+            HpDown();
+           
+            _nuckBackTime = 0.1f;
+            _bNuckBack = true;
         }
     }
 

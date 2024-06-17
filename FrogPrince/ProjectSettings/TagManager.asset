@@ -8,6 +8,7 @@ TagManager:
   - FinishPoint
   - Flower
   - StartPoint
+  - Bullet1
   layers:
   - Default
   - TransparentFX
@@ -40,7 +41,7 @@ TagManager:
   - 
   - 
   - 
-  - 
+  - BulletBorder
   m_SortingLayers:
   - name: Default
     uniqueID: 0

@@ -4,35 +4,29 @@ using UnityEngine;
 
 public class FlowerSystem : MonoBehaviour
 {
-    private SpriteRenderer _spriteRenderer;
-    public Sprite Red, Yellow, White;
+    public Animator Animator;
 
     public GameObject Collider;
 
     [HideInInspector]
     public int Color;
 
-    private void Awake()
-    {
-        _spriteRenderer = GetComponent<SpriteRenderer>();
-    }
-
     public void ChooseFlower()
     {
         Color = Random.Range(0, 3);
 
-        //switch(Color)
-        //{
-        //    case 0:
-        //        _spriteRenderer.sprite = Red;
-        //        break;
-        //    case 1:
-        //        _spriteRenderer.sprite = Yellow;
-        //        break;
-        //    case 2:
-        //        _spriteRenderer.sprite = White;
-        //        break;
-        //}
+        switch (Color)
+        {
+            case 0:
+                Animator.SetBool("bGrowRed", true);
+                break;
+            case 1:
+                Animator.SetBool("bGrowYellow", true);
+                break;
+            case 2:
+                Animator.SetBool("bGrowWhite", true);
+                break;
+        }
     }
 
     public IEnumerator GrowUpFlower()
@@ -44,6 +38,19 @@ public class FlowerSystem : MonoBehaviour
 
     public void WitherFlower()
     {
+        switch (Color)
+        {
+            case 0:
+                Animator.SetBool("bGrowRed", false);
+                break;
+            case 1:
+                Animator.SetBool("bGrowYellow", false);
+                break;
+            case 2:
+                Animator.SetBool("bGrowWhite", false);
+                break;
+        }
+
         Collider.SetActive(false);
     }
 }

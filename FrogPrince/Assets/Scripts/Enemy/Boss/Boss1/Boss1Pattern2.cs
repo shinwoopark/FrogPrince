@@ -11,9 +11,13 @@ public class Boss1Pattern2 : MonoBehaviour
 
     public BulletSystem Boss1White;
 
-    public Transform Flowers_tr, WayPoint;
+    public Transform Flowers_tr, WayPoint, BulletPos;
 
     public GameObject[] Bullets;
+
+    private SpriteRenderer _spriteRenderer;
+
+    public Transform Player_tr;
 
     public float MoveSpeed;
 
@@ -30,11 +34,7 @@ public class Boss1Pattern2 : MonoBehaviour
     private void Awake()
     {
         _boss1StateSystem = GetComponent<Boss1StateSystem>();
-    }
-
-    private void Update()
-    {
-        
+        _spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     private void FixedUpdate()
@@ -60,15 +60,33 @@ public class Boss1Pattern2 : MonoBehaviour
         {
             if (!_bHoneyIntake)
             {
-                Vector3 dir = Flowers_tr.GetChild(_chooseFlower).position - transform.position;
+                Vector3 dir = Flowers_tr.GetChild(_chooseFlower).position - transform.position;                
                 dir.Normalize();
-                transform.Translate(dir * MoveSpeed * Time.deltaTime);
+                transform.position += dir * MoveSpeed * Time.deltaTime;
+
+                if (Flowers_tr.GetChild(_chooseFlower).position.x > transform.position.x)
+                {
+                    _spriteRenderer.flipX = false;
+                }
+                else if (Flowers_tr.GetChild(_chooseFlower).position.x < transform.position.x)
+                {
+                    _spriteRenderer.flipX = true;
+                }
             }
             else if (!_bFireHoney)
             {
                 Vector3 dir = WayPoint.GetChild(_chooseFlower).position - transform.position;
                 dir.Normalize();
-                transform.Translate(dir * MoveSpeed * Time.deltaTime);
+                transform.position += dir * MoveSpeed * Time.deltaTime;
+
+                if (WayPoint.GetChild(_chooseFlower).position.x > transform.position.x)
+                {
+                    _spriteRenderer.flipX = false;
+                }
+                else if (WayPoint.GetChild(_chooseFlower).position.x < transform.position.x)
+                {
+                    _spriteRenderer.flipX = true;
+                }
             }
         }       
     }
@@ -114,6 +132,15 @@ public class Boss1Pattern2 : MonoBehaviour
 
     IEnumerator Attack()
     {
+        if (Player_tr.position.x > transform.position.x)
+        {
+            _spriteRenderer.flipX = false;
+        }
+        else if (Player_tr.position.x < transform.position.x)
+        {
+            _spriteRenderer.flipX = true;
+        }
+
         _bMove = false;
 
         yield return new WaitForSeconds(1);
@@ -121,22 +148,16 @@ public class Boss1Pattern2 : MonoBehaviour
         switch (_chooseColor)
         {
             case 0:
-                //for(int i =0; i < 3; i++)
-                //{
-                    //Instantiate(Bullets[FlowerSystem.Color], transform.position, Quaternion.identity);
-                    //yield return new WaitForSeconds(0.5f);
-                //}
-
                 for (int i = 0; i < 3; i++)
                 {
-                    Instantiate(Bullets[_chooseColor], transform.position, Quaternion.identity);
+                    Instantiate(Bullets[_chooseColor], BulletPos.position, Quaternion.identity);
                     yield return new WaitForSeconds(0.5f);
                 }
                 break;
             case 1:
                 for (int i = 0; i < 20; i++)
                 {
-                    Instantiate(Bullets[_chooseColor], transform.position, Quaternion.identity);
+                    Instantiate(Bullets[_chooseColor], BulletPos.position, Quaternion.identity);
                     yield return new WaitForSeconds(0.1f);
                 }
 
@@ -158,7 +179,7 @@ public class Boss1Pattern2 : MonoBehaviour
 
                     Boss1White = Bullets[_chooseColor].GetComponent<BulletSystem>();
                     
-                    Instantiate(Bullets[_chooseColor], transform.position, Quaternion.identity);
+                    Instantiate(Bullets[_chooseColor], BulletPos.position, Quaternion.identity);
                     Boss1White.Dir = dir;                  
                 }
 
@@ -166,7 +187,6 @@ public class Boss1Pattern2 : MonoBehaviour
                 break;
         }
 
-        GrowUpFlowers();
         EndPattern();      
     }
 
@@ -185,7 +205,7 @@ public class Boss1Pattern2 : MonoBehaviour
 
     private void WitherFlowers()
     {
-        for(int i=0; i < FlowerSystems.Length; i++)
+        for (int i = 0; i < FlowerSystems.Length; i++)
         {
             FlowerSystems[i].WitherFlower();
         }

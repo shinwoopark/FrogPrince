@@ -11,9 +11,11 @@ public class Boss1Pattern1 : MonoBehaviour
 
     public Transform Player_tr;  
 
-    public Transform StartPoint, WayPoint, FinishPoint;
+    public Transform StartPoint, WayPoint, FinishPoint, BulletPos;
 
     public GameObject WindBullet_gb;
+
+    private SpriteRenderer _spriteRenderer;
 
     private int _wayPointNumber;
 
@@ -34,6 +36,7 @@ public class Boss1Pattern1 : MonoBehaviour
     private void Awake()
     {
         _boss1StateSystem = GetComponent<Boss1StateSystem>();
+        _spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     private void Update()
@@ -60,11 +63,13 @@ public class Boss1Pattern1 : MonoBehaviour
         {
             _wayPointNumber = 0;
             _dir = 1;
+            _spriteRenderer.flipX = true;
         }
         else if(dir == 1)
         {
             _wayPointNumber = 4;
             _dir = -1;
+            _spriteRenderer.flipX = false;
         }
 
         SpawnWayPoint();
@@ -82,7 +87,16 @@ public class Boss1Pattern1 : MonoBehaviour
         }
         else if (_bFindWayPoint && _hitWayPoint < 5) 
         {
-            _wayPointDir = WayPoint.GetChild(_wayPointNumber).position - transform.position;          
+            _wayPointDir = WayPoint.GetChild(_wayPointNumber).position - transform.position;
+            
+            if(_dir < 1)
+            {
+                _spriteRenderer.flipX = true;
+            }
+            else
+            {
+                _spriteRenderer.flipX = false;
+            }
         }
         else
         {
@@ -96,13 +110,23 @@ public class Boss1Pattern1 : MonoBehaviour
     {
         if (!_bFinishMove)
         {
-            transform.Translate(_wayPointDir * MoveSpeed * Time.deltaTime);
-        }       
+            transform.position += _wayPointDir * MoveSpeed * Time.deltaTime;
+        }
     }
 
     IEnumerator WindAttack()
     {
+        if (Player_tr.position.x > transform.position.x)
+        {
+            _spriteRenderer.flipX = false;
+        }
+        else if (Player_tr.position.x < transform.position.x)
+        {
+            _spriteRenderer.flipX = true;
+        }
+
         yield return new WaitForSeconds(1);
+
         Vector3 dir = Player_tr.position - transform.position;
         dir.Normalize();
 
@@ -115,7 +139,7 @@ public class Boss1Pattern1 : MonoBehaviour
     {
         WindBullet = WindBullet_gb.GetComponent<BulletSystem>();
         WindBullet.Dir = dir;
-        Instantiate(WindBullet_gb, transform.position, Quaternion.identity);
+        Instantiate(WindBullet_gb, BulletPos.position, Quaternion.identity);
     }
 
     private void SpawnWayPoint()

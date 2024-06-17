@@ -32,6 +32,9 @@ public class BulletSystem : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        if (collision.gameObject.layer == 31)
+            Destroy(gameObject);
+
         if (collision.gameObject.layer == 3)
             bHitPlayer = true;
 
