@@ -11,12 +11,16 @@ public class PlayerControll : MonoBehaviour
 
     private PlayerStateSystem _playerState;
     private EnemyHpSystem _enemyHpSystem;
+    private Boss1StateSystem _boss1StateSystem;
+
+    public GameObject AttackEffect;
 
     public Transform AttackPos;
     public Vector2 AttackSize;
     public LayerMask HitLayers;
     public float AttackCoolTime;
     private float AttackCurrentTime = 1;
+    public AudioSource AttackSound; 
 
     public float DashPower;
     private float _dashCoolTime;
@@ -26,19 +30,25 @@ public class PlayerControll : MonoBehaviour
     private void Awake()
     {
         _playerState = GetComponent<PlayerStateSystem>();
-        _spriteRenderer = GetComponent<SpriteRenderer>();      
+        _spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     private void Update()
     {
-        InputControll();
-        UpdateTongueDir();
+        if (GameInstance.instance.bPlay == true)
+        {
+            InputControll();
+            UpdateTongueDir();
+        }          
     }
 
     private void FixedUpdate()
     {
-        UpdateDash();
-        UpdateMoveTongue();
+        if (GameInstance.instance.bPlay == true)
+        {
+            UpdateDash();
+            UpdateMoveTongue();
+        }        
     }
 
     private void InputControll()
@@ -62,16 +72,17 @@ public class PlayerControll : MonoBehaviour
             }
             else
             {
-                if (_spriteRenderer.flipY)
+                if (!_spriteRenderer.flipX)
                 {
                     AttackPos.position = transform.localPosition + new Vector3(-1, 0, 0);
                 }
-                else if (!_spriteRenderer.flipY)
+                else if (_spriteRenderer.flipX)
                 {
                     AttackPos.position = transform.localPosition + new Vector3(1, 0, 0);
                 }
             }
 
+            AttackSound.Play();
             StartCoroutine(Attack());
             AttackCurrentTime = 0;   
         }
@@ -84,9 +95,9 @@ public class PlayerControll : MonoBehaviour
             && _playerState.CurrentState != PlayerState.Climb
             && _playerState.CurrentState != PlayerState.MoveTongue)
         {
-            if (_spriteRenderer.flipY)
+            if (!_spriteRenderer.flipX)
                 _dashDirection = -1;
-            else if (!_spriteRenderer.flipY)
+            else if (_spriteRenderer.flipX)
                 _dashDirection = 1;
 
             _playerState.CurrentState = PlayerState.Dash;
@@ -108,13 +119,45 @@ public class PlayerControll : MonoBehaviour
 
         Collider2D[] AttackBox = Physics2D.OverlapBoxAll(AttackPos.position, AttackSize, 0, HitLayers);
 
-        foreach(Collider2D hit in AttackBox)
+        Quaternion dir = Quaternion.identity;
+
+        if (Input.GetKey(KeyCode.UpArrow) && !Input.GetKey(KeyCode.DownArrow))
         {
-            if(hit.gameObject.layer == 6)
+            dir = Quaternion.Euler(0, 0, 90);
+        }
+        else if (!Input.GetKey(KeyCode.UpArrow) && Input.GetKey(KeyCode.DownArrow))
+        {
+            dir = Quaternion.Euler(0, 0, 270);
+        }
+        else
+        {
+            if (!_spriteRenderer.flipX)
+            {
+                dir = Quaternion.Euler(0, 0, 180);
+            }
+            else if (_spriteRenderer.flipX)
+            {
+
+                dir = Quaternion.Euler(0, 0, 0);
+            }
+        }
+
+        Instantiate(AttackEffect, AttackPos.position, dir);
+
+        foreach (Collider2D hit in AttackBox)
+        {
+            if (hit.gameObject.layer == 6)
             {
                 _enemyHpSystem = hit.GetComponent<EnemyHpSystem>();
 
                 _enemyHpSystem.HpDown();
+            }
+            else if (hit.gameObject.layer == 20)
+            {
+                Debug.Log("!");
+                _boss1StateSystem = hit.GetComponent<Boss1StateSystem>();
+
+                _boss1StateSystem.HpDown();
             }
         }
 
@@ -160,6 +203,6 @@ public class PlayerControll : MonoBehaviour
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.blue;
-        //Gizmos.DrawCube(AttackPos.position, AttackSize);
+        Gizmos.DrawCube(AttackPos.position, AttackSize);
     }
 }

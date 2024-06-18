@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class Boss1Pattern1 : MonoBehaviour
 {
+    public AudioSource AttackSound;
+
     private Boss1StateSystem _boss1StateSystem;
 
     public BulletSystem WindBullet;
@@ -133,6 +135,8 @@ public class Boss1Pattern1 : MonoBehaviour
         FireWind(dir);
         FireWind(dir -= new Vector3(0.5f, 0, 0));
         FireWind(dir -= new Vector3(-1.5f, 0, 0));
+
+        AttackSound.Play();
     }
 
     private void FireWind(Vector3 dir)

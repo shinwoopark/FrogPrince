@@ -33,15 +33,21 @@ public class PlayerMove : MonoBehaviour
 
     void Update()
     {
-        InputMove();
+        if (GameInstance.instance.bPlay == true)
+        {
+            InputMove();
+        }      
     }
 
     private void FixedUpdate()
     {
-        UpdateFoward();
-        UpdateJump();
-        UpdateChargeJump();
-        UpdateClimb();
+        if (GameInstance.instance.bPlay == true)
+        {
+            UpdateFoward();
+            UpdateJump();
+            UpdateChargeJump();
+            UpdateClimb();
+        }          
     }
 
     private void InputMove()
@@ -49,26 +55,26 @@ public class PlayerMove : MonoBehaviour
         _moveDir = 0;
         if (Input.GetKey(KeyCode.RightArrow) && !Input.GetKey(KeyCode.LeftArrow))
         {
-            if(_playerState.bWall && !_spriteRenderer.flipY)
+            if(_playerState.bWall && _spriteRenderer.flipX)
             {
                 return;
             }
             else
             {
                 _moveDir = 1;
-                _spriteRenderer.flipY = false;
+                _spriteRenderer.flipX = true;
             }
         }
         else if (Input.GetKey(KeyCode.LeftArrow) && !Input.GetKey(KeyCode.RightArrow))
         {
-            if (_playerState.bWall && _spriteRenderer.flipY)
+            if (_playerState.bWall && !_spriteRenderer.flipX)
             {
                 return;
             }
             else
             {
                 _moveDir = -1;
-                _spriteRenderer.flipY = true;
+                _spriteRenderer.flipX = false;
             }           
         }
 

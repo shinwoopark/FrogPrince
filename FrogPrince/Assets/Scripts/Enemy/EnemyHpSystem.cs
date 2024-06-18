@@ -13,8 +13,8 @@ public class EnemyHpSystem : MonoBehaviour
 
     private void Awake()
     {
-        _enemyState = GetComponent<EnemyStateSystem>();
         _spriteRenderer = GetComponent<SpriteRenderer>();
+        _enemyState = GetComponent<EnemyStateSystem>();
     }
 
     private void Start()
@@ -43,7 +43,18 @@ public class EnemyHpSystem : MonoBehaviour
 
     public void HpDown()
     {
-        CurrentHp -= 1;
+        if(_enemyState.CurrentState != EnemyState.Death)
+        {
+            CurrentHp -= 1;
+            StartCoroutine(TurnRed());
+        }     
+    }
+
+    IEnumerator TurnRed()
+    {
+        _spriteRenderer.color = Color.red * 0.8f;
+        yield return new WaitForSeconds(0.1f);
+        _spriteRenderer.color = Color.white;
     }
 
     public void UpdateDeath()

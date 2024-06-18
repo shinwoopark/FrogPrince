@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Boss1Pattern2 : MonoBehaviour
 {
+    public AudioSource Pattern1, Pattern2, Pattern3;
+
     private Boss1StateSystem _boss1StateSystem;
     public FlowerSystem FlowerSystem;
 
@@ -148,22 +150,26 @@ public class Boss1Pattern2 : MonoBehaviour
         switch (_chooseColor)
         {
             case 0:
-                for (int i = 0; i < 3; i++)
+                for (int i = 0; i < 2; i++)
                 {
                     Instantiate(Bullets[_chooseColor], BulletPos.position, Quaternion.identity);
+                    Pattern1.Play();
                     yield return new WaitForSeconds(0.5f);
                 }
                 break;
             case 1:
-                for (int i = 0; i < 20; i++)
+                for (int i = 0; i < 10; i++)
                 {
                     Instantiate(Bullets[_chooseColor], BulletPos.position, Quaternion.identity);
+                    Pattern2.Play();
                     yield return new WaitForSeconds(0.1f);
                 }
 
                 yield return new WaitForSeconds(0.5f);
                 break;
             case 2:
+                Pattern3.Play();
+
                 int numBullets = 36;
                 float angleStep = 360.0f / numBullets;
                 float radius = 2.0f;

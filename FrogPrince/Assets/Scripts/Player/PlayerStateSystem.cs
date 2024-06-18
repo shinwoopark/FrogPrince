@@ -42,14 +42,20 @@ public class PlayerStateSystem : MonoBehaviour
 
     private void Update()
     {
-        UpdateGravitySet();
-        UpdateRayCast();
-        UpdateHitWall();
+        if (GameInstance.instance.bPlay == true)
+        {
+            UpdateGravitySet();
+            UpdateRayCast();
+            UpdateHitWall();
+        }         
     }
 
     private void FixedUpdate()
     {
-        UpdateGravity();
+        if (GameInstance.instance.bPlay == true)
+        {
+            UpdateGravity();
+        }           
     }
 
     private void UpdateGravitySet()
@@ -81,10 +87,10 @@ public class PlayerStateSystem : MonoBehaviour
     {
         float dir = 1;
 
-        if (_spriteRenderer.flipY)        
-            dir = -1;        
-        else if (!_spriteRenderer.flipY)       
-            dir = 1;
+        if (_spriteRenderer.flipX)        
+            dir = 1;        
+        else if (!_spriteRenderer.flipX)       
+            dir = -1;
         
         RaycastHit2D downHit = Physics2D.Raycast(transform.position, Vector2.down, GroundRayLenth, GroundCheck);
         RaycastHit2D upHit = Physics2D.Raycast(transform.position, Vector2.up, CeilingRayLenth, CeilingCheck);

@@ -4,7 +4,14 @@ using UnityEngine;
 
 public class Boss1WindBomb : BulletSystem
 {
+    public AudioSource AudioSource;
+
     public float DeathTimer;
+
+    private void Start()
+    {
+        AudioSource.Play();
+    }
 
     private void Update()
     {

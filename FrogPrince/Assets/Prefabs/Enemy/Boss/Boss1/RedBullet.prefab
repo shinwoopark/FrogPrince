@@ -48,7 +48,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Damage: 1
-  MoveSpeed: 5
+  MoveSpeed: 3
   Dir: {x: 0, y: 0, z: 0}
   bHitPlayer: 0
   bHitPlatform: 0
@@ -105,8 +105,8 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 5
-  m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
-  m_Color: {r: 0.7830189, g: 0.18836774, b: 0.18836774, a: 1}
+  m_Sprite: {fileID: 21300000, guid: 14a9b38e86cec2b4a8d4599e172551ed, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0

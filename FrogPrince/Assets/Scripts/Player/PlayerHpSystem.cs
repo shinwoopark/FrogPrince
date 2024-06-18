@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class PlayerHpSystem : MonoBehaviour
 {
+    public GameManager GameManager;
+
     private EnemyStateSystem _enemyStateSystem;
     private BulletSystem _bulletSystem;
     private BossStateSystem _bossStateSystem;
@@ -26,12 +28,18 @@ public class PlayerHpSystem : MonoBehaviour
 
     private void Update()
     {
-        CoolTimeSystem();
+        if (GameInstance.instance.bPlay == true)
+        {
+            CoolTimeSystem();
+            Death();
+        }
+            
     }
 
     private void FixedUpdate()
     {
-        UpdateNuckBack();
+        if (GameInstance.instance.bPlay == true)
+            UpdateNuckBack();
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -39,6 +47,8 @@ public class PlayerHpSystem : MonoBehaviour
         if(collision.gameObject.layer == 6
             || collision.gameObject.layer == 20)
         {
+            gameObject.layer = 10;
+           
             ContactPoint2D contact = collision.contacts[0];
             Vector3 hitPos = contact.point;
 
@@ -63,9 +73,9 @@ public class PlayerHpSystem : MonoBehaviour
                 _damage = _bossStateSystem.Damage;
                 _nuckBackPower = _bossStateSystem.NuckBackPower;
             }
-            
+
             HpDown();
-           
+
             _nuckBackTime = 0.1f;
             _bNuckBack = true;
         }
@@ -75,9 +85,12 @@ public class PlayerHpSystem : MonoBehaviour
     {
         if(collision.gameObject.layer == 11)
         {
+            gameObject.layer = 10;            
+
             _bulletSystem = collision.gameObject.GetComponent<BulletSystem>();
 
             _damage = _bulletSystem.Damage;
+
             HpDown();
         }
     }
@@ -86,6 +99,8 @@ public class PlayerHpSystem : MonoBehaviour
     {
         GameInstance.instance.CurrentHp -= _damage;
         InvincibilityTime = 1;
+
+        GameManager.Hp();
 
         if (GameInstance.instance.CurrentHp > 0)
             StartCoroutine(Blink());
@@ -103,6 +118,14 @@ public class PlayerHpSystem : MonoBehaviour
         yield return new WaitForSeconds(0.25f);
     }
 
+    private void Death()
+    {
+        if(GameInstance.instance.CurrentHp <= 0)
+        {
+            _spriteRenderer.color = new Color(0, 0, 0, 0);
+        }
+    }
+
     private void UpdateNuckBack()
     {
         if (_bNuckBack)
@@ -115,7 +138,6 @@ public class PlayerHpSystem : MonoBehaviour
     {
         if (InvincibilityTime > 0)
         {
-            gameObject.layer = 10;
             InvincibilityTime -= Time.deltaTime;
         }
         else if( InvincibilityTime <= 0)

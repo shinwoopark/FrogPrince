@@ -6,6 +6,8 @@ public class GameInstance : MonoBehaviour
 {
     public static GameInstance instance;
 
+    public bool bPlay;
+
     //Player
     public int TrasformLevel;
     public float CurrentHp;
@@ -20,5 +22,14 @@ public class GameInstance : MonoBehaviour
         }
         else
             Destroy(gameObject);
+
+        bPlay = true;
+    }
+
+    public void GameStart()
+    {
+        bPlay = true;
+        TrasformLevel = 1;
+        CurrentHp = MaxHp;
     }
 }
